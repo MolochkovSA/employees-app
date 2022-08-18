@@ -1,3 +1,5 @@
+import { Component } from 'react'
+
 import AppInfo from '../app-info/app-info'
 import SearchPannel from '../search-panel/search-pannel'
 import AppFilter from '../app-filter/app-filter'
@@ -6,24 +8,52 @@ import EmployeesAddForm from '../employees-add-form/employees-add-form'
 
 import './app.css'
 
-const App = () => {
-  const data = [
-    { name: 'Tom Tomas', salary: 800, increase: true, id: 1 },
-    { name: 'Bob Bobus', salary: 3000, increase: false, id: 2 },
-    { name: 'Fred Fredus', salary: 5000, increase: false, id: 3 },
-  ]
+class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      data: [
+        { name: 'Tom Tomas', salary: 800, increase: true, id: 1 },
+        { name: 'Bob Bobus', salary: 3000, increase: false, id: 2 },
+        { name: 'Fred Fredus', salary: 5000, increase: false, id: 3 },
+      ],
+    }
+  }
+  maxIndex = (arr) => {
+    arr.sort((a, b) => a.id - b.id)
+    return arr[arr.length - 1].id
+  }
 
-  return (
-    <div className="app">
-      <AppInfo />
-      <div className="search-pannel">
-        <SearchPannel />
-        <AppFilter />
+  deleteItem = (id) => {
+    this.setState(({ data }) => ({
+      data: data.filter((item) => {
+        return item.id !== id
+      }),
+    }))
+  }
+
+  createItem = (item) => {
+    item.increase = false
+    item.id = this.maxIndex(this.state.data) + 1
+    this.setState(({ data }) => {
+      const newArr = [...data, item]
+      return { data: newArr }
+    })
+  }
+
+  render() {
+    return (
+      <div className="app">
+        <AppInfo />
+        <div className="search-pannel">
+          <SearchPannel />
+          <AppFilter />
+        </div>
+        <EmployeesList data={this.state.data} onDelete={this.deleteItem} />
+        <EmployeesAddForm onCreate={this.createItem} />
       </div>
-      <EmployeesList data={data} />
-      <EmployeesAddForm />
-    </div>
-  )
+    )
+  }
 }
 
 export default App
